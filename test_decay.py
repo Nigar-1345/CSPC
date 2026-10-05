@@ -16,12 +16,21 @@ def test_starts_at_N0():
     assert simulate(1000, 0.4)[0] == 1000
 
 
-# TODO 1: test_rejects_negative_rate
-#   Check that calling simulate(...) with a negative lam raises a ValueError.
-#   Which pytest tool checks that an error is raised?
+def test_rejects_negative_rate():
+    # Check that calling simulate with a negative lam raises a ValueError
+    with pytest.raises(ValueError):
+        simulate(1000, -0.4)
 
 
-# TODO 2: test_matches_law
-#   Check that the simulation's AVERAGE over many seeds is close to the
-#   physical law  N0 * exp(-lam * t).
-#   Which pytest tool compares floating-point values with a tolerance?
+def test_matches_law():
+    # Check that the simulation is close to the physical law N0 * exp(-lam * t)
+    N0 = 1000
+    lam = 0.3
+    t = 2.0
+    expected = N0 * np.exp(-lam * t)
+    
+    # Run multiple simulations and check the average value
+    runs = [simulate(N0, lam, t_max=t)[-1] for _ in range(50)]
+    avg_result = np.mean(runs)
+    
+    assert avg_result == pytest.approx(expected, rel=0.05)
